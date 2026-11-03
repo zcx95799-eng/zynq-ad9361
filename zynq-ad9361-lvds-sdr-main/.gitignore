@@ -1,0 +1,34 @@
+# Vivado
+.Xil/
+*.jou
+*.log
+*.str
+*.dcp
+*.wdb
+*.pb
+*.runs/
+*.cache/
+*.sim/
+*.hw/
+*.ip_user_files/
+*.sdk/
+
+# Qt
+build-*/
+dist/
+*.exe
+*.dll
+*.o
+*.obj
+*.user
+.qtcreator/
+.qtcreator_backup/
+
+# Python
+__pycache__/
+*.pyc
+
+# Temporary and backup files
+*.bak
+*.tmp
+*~

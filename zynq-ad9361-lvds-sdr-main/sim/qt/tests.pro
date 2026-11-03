@@ -1,0 +1,10 @@
+QT += core gui widgets network testlib
+CONFIG += testcase console c++17
+CONFIG -= app_bundle
+TARGET = monitor_tests
+INCLUDEPATH += ..
+SOURCES += tst_monitor.cpp ../monitorprotocol.cpp ../monitorreceiver.cpp ../monitorsender.cpp ../demodsymbolmodel.cpp ../mainwindow.cpp ../plotwidget.cpp ../spectrum.cpp
+HEADERS += ../monitorprotocol.h ../monitorreceiver.h ../monitorsender.h ../demodsymbolmodel.h ../mainwindow.h ../plotwidget.h ../spectrum.h
+SOURCES += ../sendpayloadprotocol.cpp
+HEADERS += ../sendpayloadprotocol.h
+msvc: QMAKE_CXXFLAGS += /utf-8

@@ -1,0 +1,105 @@
+`timescale 1ns / 1ps
+
+module tb;
+
+    parameter GLOBAL_CLK_FRE_HZ             = 32'd61_200_000; // 32'd100_000_000                
+    parameter PN_CODE_NCO_PHASE_WIDTH       = 32'd32;           // 浼爜NCO鐩镐綅鎺у埗瀛椾綅瀹 
+    parameter PN_CODE_RATE_HZ               = 32'd4_080_000;    // 浼爜閫熺巼
+    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    reg clk_g;
+    reg rst;
+    
+    wire signed [11:0] w12_out_baseband_I;
+    wire signed [11:0] w12_out_baseband_Q;
+
+    // 鍙戝皠鏈 
+	trans_top #(
+    				.GLOBAL_CLK_FRE_HZ(GLOBAL_CLK_FRE_HZ),
+    				.PN_CODE_NCO_PHASE_WIDTH(PN_CODE_NCO_PHASE_WIDTH),
+    				.PN_CODE_RATE_HZ(PN_CODE_RATE_HZ)                
+				)
+				trans_top_inst
+				(
+    				.clk_g(clk_g),
+    				.rst(rst),
+
+    				.iw32_din_ModSch_message(32'b01),
+    				
+    				.ow12_out_baseband_I(w12_out_baseband_I),
+    				.ow12_out_baseband_Q(w12_out_baseband_Q)
+				);
+
+    // 鎺ユ敹鏈 
+    Receiver_Top
+    #
+    (
+        .GLOBAL_CLK_FRE_HZ(GLOBAL_CLK_FRE_HZ),
+        
+        .STATISTICAL_PERIOD_MS(1000),
+        
+        .ACQ_INPUT_DATA_WIDTH(12),
+        .ACQ_OUTPUT_DATA_WIDTH(16),
+        .ACQ_LOCAL_CARRIER_NCO_PHASE_WIDTH(32),
+        .ACQ_LOCAL_CARRIER_NCO_OUTPUT_WIDTH(4),   
+        
+        .PN_CODE_NCO_PHASE_WIDTH(PN_CODE_NCO_PHASE_WIDTH),   // 涓嶈鐢 64,浠跨湡涓嶆敮鎸佽秴杩 64bit鐨勬暟鎹 
+        .PN_CODE_RATE_HZ(PN_CODE_RATE_HZ),
+        .PN_CODE_NUM_EACH_CYCLE(1020),
+        
+        .DOWN_SAMPLE_OUTPUT_RATE_HZ(12240000),
+        .DOWN_SAMPLE_OUTPUT_RATE_KHZ(12240),
+        
+        .COHERENT_INTEGRATION_TIME_US(250),
+        
+        .PMF_FFT_X(612),                                                
+        .PMF_FFT_N(128),                      
+        .CNT_CAL_PER_RAM(3),                  
+        .FFT_INPUT_DATA_WIDTH(32),            
+        
+        .LOCAL_CARRIER_CYCLE_CNT_WIDTH(32),   
+        .CORR_OUTPUT_DATA_WIDTH(19),          
+        .DLL_COEFFICIENT_WIDTH(32),           
+        .CORDIC_OUTPUT_DATA_WIDTH(13),        
+        .CORDIC_OUTPUT_LATENCY(17),           
+        .FLL_PLL_COEFFICIENT_WIDTH(32),       
+        .FLL_INDEPENDENT_OPERATION_TIME_MS(1),
+    
+        .T3_US(28000)
+    )
+    Receiver_Top_inst
+    (
+        .iw_Clk_p_g(clk_g),
+        .iw_Rst_n_g(rst),
+       
+        .iw_Control_SoftRst(1'b0),
+       
+        .iw12_Baseband_I(w12_out_baseband_I),
+        .iw12_Baseband_Q(w12_out_baseband_Q)
+    );
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 鏃堕挓鐢熸垚
+    always #8.169934 clk_g = ~clk_g;   // 61.2MHz
+
+    integer i;
+
+    initial 
+    begin
+/////////////////////////////////////////////////
+        // 鍒濆鍖栦俊鍙 
+        clk_g = 1;
+        rst = 0;
+
+        // 澶嶄綅杩囩▼
+        #1000 rst = 0;
+        #1000 rst = 1;
+
+/////////////////////////////////////////////////
+        #10.001;
+
+    end
+
+endmodule
