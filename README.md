@@ -19,7 +19,7 @@
 
 ## 系统总体架构
 
-![系统总体架构](report/figures/system_architecture.png)
+![系统总体架构](zynq-ad9361-lvds-sdr-main/report/figures/system_architecture.png)
 
 系统由电脑端 Qt 上位机、Zynq 处理器系统、FPGA 可编程逻辑和 AD9361 射频前端组成。
 
@@ -34,7 +34,7 @@ AD9361 LVDS 接口具备 2R2T 数据能力。当前接收算法链主要使用�
 
 ### 硬件平台
 
-![Zynq与AD9361开发板](report/figures/hardware_platform.jpeg)
+![Zynq与AD9361开发板](zynq-ad9361-lvds-sdr-main/report/figures/hardware_platform.jpeg)
 
 ## 主要配置
 
@@ -60,7 +60,7 @@ AD9361 LVDS 接口具备 2R2T 数据能力。当前接收算法链主要使用�
 
 ## 收发信号流程
 
-![收发信号处理流程](report/figures/signal_flow.png)
+![收发信号处理流程](zynq-ad9361-lvds-sdr-main/report/figures/signal_flow.png)
 
 ### 发射链
 
@@ -90,13 +90,13 @@ AD9361 输出的 I/Q 数据首先经过直流抑制、滤波和功率检测。�
 
 ## PMF-FFT 捕获
 
-![PMF-FFT捕获流程](report/figures/acquisition_flow.png)
+![PMF-FFT捕获流程](zynq-ad9361-lvds-sdr-main/report/figures/acquisition_flow.png)
 
 捕获模块采用 20 路复数分段相关通道并行计算不同码相位，每段积分 612 个采样点，每个候选码相位形成 5 个复数相关结果。相关结果补零后送入共享 128 点复数 FFT，通过频域搜索获得峰值位置、粗码相位和粗频偏估计。
 
 实现中采用循环采样缓存和相关结果双缓存。采样写入、相关读取和 FFT 处理按批次交替进行，不同码相位通过时间调度复用同一个 FFT 核。峰值通过门限判断后，控制逻辑生成载波与码 NCO 初值，并按照捕获控制时序启动跟踪。
 
-![捕获与跟踪协同结构](report/figures/acquisition_tracking.png)
+![捕获与跟踪协同结构](zynq-ad9361-lvds-sdr-main/report/figures/acquisition_tracking.png)
 
 系统保留产生获胜峰值的完整 FFT 功率帧及其前序完整帧。每帧包含 128 个原始功率点，最多保存 8 帧，形成 1024 点成功捕获观察窗口。该窗口用于记录捕获事件，不代表算法使用 1024 点 FFT。
 
@@ -113,7 +113,7 @@ AD9361 输出的 I/Q 数据首先经过直流抑制、滤波和功率检测。�
 
 ## 监测数据与网络协议
 
-![监测数据回传和MONI布局](report/figures/monitor_protocol.png)
+![监测数据回传和MONI布局](zynq-ad9361-lvds-sdr-main/report/figures/monitor_protocol.png)
 
 系统使用两条独立 TCP 连接：
 
@@ -151,7 +151,7 @@ MONI type 5 完整网络帧为 5136 B，由 16 B 帧头和 5120 B 载荷组成�
 
 ## Qt 上位机
 
-![上位机数据处理流程](report/figures/host_processing.png)
+![上位机数据处理流程](zynq-ad9361-lvds-sdr-main/report/figures/host_processing.png)
 
 Qt 上位机在接收线程中完成 TCP 字节流组帧、MONI 解析和辅助分片重组，界面周期性读取接收快照。接收 I/Q、解调结果、扩频前参考和成功捕获窗口按照各自的数据来源与更新条件独立管理。
 
@@ -168,11 +168,11 @@ Qt 上位机在接收线程中完成 TCP 字节流组帧、MONI 解析和辅助�
 
 ### 业务发送与波形显示
 
-![Qt收发工作台](report/figures/qt_transceiver.png)
+![Qt收发工作台](zynq-ad9361-lvds-sdr-main/report/figures/qt_transceiver.png)
 
 ### 频谱显示
 
-![Qt频谱对比](report/figures/qt_spectrum.png)
+![Qt频谱对比](zynq-ad9361-lvds-sdr-main/report/figures/qt_spectrum.png)
 
 主频谱页面比较发射端 PN 异或前参考与接收端尚未解扩的 I/Q。参考数据使用 4096 点分段，接收 I/Q 使用 128 点分段，两者均采用 50% 重叠的 Welch 功率谱估计。接收曲线进一步对多组快照进行线性功率平均。
 
@@ -180,7 +180,7 @@ Qt 上位机在接收线程中完成 TCP 字节流组帧、MONI 解析和辅助�
 
 ### 成功捕获窗口
 
-![Qt成功捕获窗口](report/figures/qt_capture_window.png)
+![Qt成功捕获窗口](zynq-ad9361-lvds-sdr-main/report/figures/qt_capture_window.png)
 
 上位机在收到全部捕获分片后统一更新功率窗口，并保持到下一次完整成功结果到达。横轴表示连续有效输出点序号，峰值位置用于关联具体捕获事件。
 
@@ -188,17 +188,17 @@ Qt 上位机在接收线程中完成 TCP 字节流组帧、MONI 解析和辅助�
 
 ### Vivado 系统设计
 
-![Vivado系统设计](report/figures/vivado_block_design.png)
+![Vivado系统设计](zynq-ad9361-lvds-sdr-main/report/figures/vivado_block_design.png)
 
 工程使用 Vivado 2019.1，处理器系统通过 AXI DMA、AXI Interconnect、AXI4-Stream FIFO 和自定义 AD9361 配置接口与 FPGA 数据通路连接。
 
 ### 仿真波形
 
-![接收链仿真波形](report/figures/simulation_waveform.png)
+![接收链仿真波形](zynq-ad9361-lvds-sdr-main/report/figures/simulation_waveform.png)
 
 ### 射频输出观察
 
-![频谱仪测试](report/figures/spectrum_analyzer.jpeg)
+![频谱仪测试](zynq-ad9361-lvds-sdr-main/report/figures/spectrum_analyzer.jpeg)
 
 频谱仪设置图中可见中心频率为 1.5 GHz、跨度为 20 MHz，用于观察实际射频输出频谱。
 
@@ -216,7 +216,7 @@ PMF-FFT 捕获在 20 路复数相关通道后共享一个 FFT 核，不为每个
 
 共享结构将 FFT 实例数从 20 个减少为 1 个；按相同 FFT 实例线性比较，FFT 部分的 LUT、寄存器、BRAM 和 DSP 需求约减少 95%。相关结果逻辑存储量减少 2400 bit，约为 18.75%。这些数值描述 FFT 部分的结构对比，不等同于整个系统资源减少比例。
 
-![Vivado资源利用率](report/figures/resource_utilization.png)
+![Vivado资源利用率](zynq-ad9361-lvds-sdr-main/report/figures/resource_utilization.png)
 
 ## 源码目录
 
@@ -271,9 +271,3 @@ PMF-FFT 捕获在 20 路复数相关通道后共享一个 FFT 核，不为每个
 3. J. W. Cooley and J. W. Tukey, "An algorithm for the machine calculation of complex Fourier series," *Mathematics of Computation*, 1965.
 4. D. J. R. van Nee and A. J. R. M. Coenen, "New fast GPS code-acquisition technique using FFT," *Electronics Letters*, 1991.
 5. D. Akopian, "Fast FFT based GPS satellite acquisition methods," *IEE Proceedings Radar Sonar and Navigation*, 2005.
-
-## 说明
-
-- 仓库目录和文件名使用英文，中文用于 README 正文和源码注释。
-- 系统结构图和算法流程图采用纯黑纯白样式。
-- 第三方和版权说明见 [`third_party_notices.md`](third_party_notices.md)。
