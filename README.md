@@ -254,7 +254,7 @@ PMF-FFT 捕获在 20 路复数相关通道后共享一个 FFT 核，不为每个
 | `board` | 板级约束和硬件说明 |
 | `report` | 系统报告、图片和协作记录 |
 
-源码模块索引见 [`report/source_manifest.md`](report/source_manifest.md)。
+源码模块索引见 [`report/source_manifest.md`](zynq-ad9361-lvds-sdr-main/report/source_manifest.md)。
 
 ## 软件环境
 
